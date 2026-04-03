@@ -1,0 +1,13 @@
+---
+description: WCAG 2.1 AA compliance requirements for the widget
+alwaysApply: true
+---
+
+# Accessibility
+
+- WCAG 2.1 Level AA compliance. Not optional.
+- Keyboard navigable (Tab, Enter, Escape, arrows). ARIA live regions for hints. Proper roles (`tooltip`, `dialog`).
+- Focus management: hint appears → focus moves. Dismissed → focus returns.
+- Color contrast 4.5:1. Respect `prefers-reduced-motion` and `prefers-color-scheme`.
+- All images/icons have alt text or aria-label.
+- Run axe-core in CI. Keyboard-only E2E tests. Screen reader testing before major releases.

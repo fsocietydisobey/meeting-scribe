@@ -1,0 +1,55 @@
+---
+description: Code conventions for Python, TypeScript, logging, state classification, and transport
+alwaysApply: true
+---
+
+# Conventions
+
+## Python
+- Python 3.12+. Modern syntax: `str | None`, `list[str]`, `dict[str, Any]`.
+- Async throughout. Type hints on all signatures.
+- Imports: stdlib → third-party → `chimera_sdk.*`.
+- Always run `black` after modifying a Python file.
+- Use `uv install <package>` to add dependencies.
+
+## TypeScript / JavaScript
+- Strict mode. No `any` unless interfacing with third-party libs.
+- Framework-agnostic core, React bindings as separate export.
+- Buffer events client-side, flush every 100ms. Critical events flush immediately.
+- ES6+ only. Always use fat arrow functions (`const fn = () => {}`), `const`/`let` (never `var`), destructuring, template literals, modules (`import`/`export`).
+- Always format with `prettier` after modifying a JS/TS file.
+- **camelCase everywhere** in frontend — variables, functions, props, file names. No mixed casing. Exception: POST request body data uses `snake_case` to match backend Python.
+
+## Frontend tooling
+- **Always run `nvm use` before any Node.js work.** The `.nvmrc` pins the correct Node version. Never skip this.
+- **Vite** for all frontend packages — build, dev server, lib mode for SDK outputs (ESM + CJS).
+- Scaffold with `npm create vite@latest`. Use `vite-plugin-dts` for TypeScript declarations.
+- **npm workspaces** for monorepo. All frontend packages under `packages/`. Use `npm` only — not pnpm, not yarn.
+
+## Frontend state management
+- **Redux Toolkit (RTK)** for all state. **RTK Query** for all server data fetching/caching.
+- One slice per feature (`eventsSlice`, `hintsSlice`, `sessionSlice`). RTK Query APIs live alongside features.
+- Components are thin — dispatch and select only. Logic in slices/thunks/RTK Query endpoints.
+- `createSlice` for sync state, `createAsyncThunk` for complex async. `createSelector` for derived data.
+- Never store derived data in Redux.
+
+## Architecture standards (frontend and backend)
+- **No flat file structures.** All code — Python, TypeScript, JavaScript — must be organized into nested folders by domain/feature. 5-6+ files at the same level needs subdirectories.
+- Code must be modular. Single responsibility per file. Extract shared logic. No god-files.
+- Both frontend and backend must meet senior-level engineering standards: clear separation of concerns, well-defined module boundaries, consistent patterns.
+- Every directory must have a clear purpose. If you can't explain what a folder contains in one sentence, restructure it.
+- **Clean, professional code.** Proper spacing — blank lines between logical sections, consistent indentation, breathing room between functions/methods/classes. No wall-of-code blocks. Code must be immediately readable. Applies to both frontend and backend.
+
+## Logging
+- Structured logging to stderr only.
+- Never log user behavioral data at INFO level — use DEBUG (privacy).
+
+## State classification
+- Rules engine first (no LLM) for 90% of cases: STUCK, FLOW, CONFUSED, LEARNING, NORMAL.
+- LLM (Haiku) only for novel situations — always cache the result.
+- Prefetch likely hints on page load.
+
+## Transport
+- WebSocket primary (bidirectional, one connection per session).
+- HTTP POST + long-poll fallback for blocked WebSocket environments.
+- Events stream up, actions push down, all over one connection.

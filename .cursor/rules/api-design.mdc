@@ -1,0 +1,41 @@
+---
+description: API design standards and system architecture principles
+alwaysApply: true
+---
+
+# API Design & System Architecture
+
+## Architecture philosophy
+This codebase must read like it was built by senior engineers. Every file, folder, and function should demonstrate intentional design.
+
+### Separation of concerns
+- **Frontend:** presentation only. No business logic in components. State in RTK slices. Data fetching via RTK Query. Components only dispatch and select.
+  - `features/` — one folder per domain (slice, API, components, hooks, types).
+  - `store/` — Redux store config, root reducer, middleware.
+  - `components/` — shared UI only. Feature-specific components in feature folders.
+  - `hooks/` / `types/` — shared only. Feature-specific in feature folders.
+- **Backend layered architecture:**
+  - `routes/` — thin HTTP handlers. Validate, call service, return.
+  - `services/` — business logic. Never touches HTTP or DB directly.
+  - `repositories/` — data access. Returns domain objects.
+  - `models/` — Pydantic models, TypedDict state.
+  - `middleware/` — auth, rate limiting, tenant resolution.
+
+### Modular by feature
+- Organize by feature/domain, not by type. Each feature module should be extractable as its own package.
+
+### Dependency direction
+- Routes → services → repositories → models. Inner layers never import outer.
+- Use dependency injection (`Depends()`) — no hard-coded concrete imports in business logic.
+
+## REST conventions
+- Versioned: `/api/v1/...`. Plural nouns. Standard HTTP methods.
+- Success: `{ "data": {...}, "meta": {...} }`. Error: `{ "error": { "code", "message", "details" } }`
+- Cursor pagination for streams, offset for lists. Filter/sort via query params.
+- Rate limit headers on every response.
+
+## Status codes
+200 (success), 201 (created), 204 (no content), 400 (validation), 401 (unauthorized), 403 (forbidden), 404 (not found), 409 (conflict), 422 (unprocessable), 429 (rate limited), 500 (bug).
+
+## WebSocket
+- JSON with `type` field. Server pushes: `type` + `action`. Error frames: `type: "error"`. Heartbeat: ping/pong every 30s.

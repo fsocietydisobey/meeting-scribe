@@ -1,0 +1,18 @@
+---
+description: Bundle size budgets and backend response time SLAs
+alwaysApply: true
+---
+
+# Performance Budgets
+
+## Frontend
+- Core SDK: < 8 KB gzipped. Full with widget: < 25 KB. With React: < 35 KB.
+- No main thread blocking > 16ms. Measure bundle size in CI.
+
+## Backend (p95)
+- Event ingestion: < 20ms. Classification: < 50ms. Cached hints: < 5ms. Haiku: < 300ms. Spatial: < 1s. Dashboard: < 200ms.
+- No DB query > 100ms. EXPLAIN ANALYZE on new queries.
+- WebSocket establishment: < 100ms. Handle 10k concurrent connections per instance.
+
+## Monitoring
+- Track p50/p95/p99. Track bundle size trends. Alert on regressions.

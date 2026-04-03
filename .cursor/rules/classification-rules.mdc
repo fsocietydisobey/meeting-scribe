@@ -1,0 +1,12 @@
+---
+description: Keep classification rules documentation in sync with code
+alwaysApply: true
+---
+
+# Classification Rules Sync Policy
+
+When adding, removing, or modifying a classification rule in `src/chimera_sdk/classifier/rules/builtin.py`, you MUST also update `docs/CLASSIFICATION-RULES.md` in the same commit.
+
+Update: Active Rules table, Rule Details section, Metrics Used table if new metrics are referenced.
+
+Source of truth: code in `builtin.py`, docs in `CLASSIFICATION-RULES.md`. Both must match. Divergence is a bug.

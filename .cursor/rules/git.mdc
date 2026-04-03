@@ -1,0 +1,28 @@
+---
+description: Git branching strategy, commit conventions, and PR standards
+alwaysApply: true
+---
+
+# Git & Branching
+
+## Branch naming
+- `main` — production-ready, protected. No direct pushes.
+- `develop` — integration branch. PRs merge here first.
+- `feature/<ticket-or-name>` — new features
+- `fix/<description>` — bug fixes
+- `chore/<description>` — maintenance, deps, CI
+- `refactor/<description>` — structural changes, no behavior change
+
+## Commits
+- Conventional commits: `feat:`, `fix:`, `chore:`, `refactor:`, `test:`, `docs:`, `perf:`, `ci:`
+- Atomic commits — one logical change per commit.
+- Imperative mood: "add event buffer" not "added event buffer".
+- First line under 72 chars. Body for non-obvious changes.
+
+## Pull requests
+- Small and focused. One feature/fix per PR. 10+ files = consider splitting.
+- Every PR: clear title, description of what/why, test plan.
+- Require at least one review. Squash merge. Delete branch after merge.
+
+## Protected branches
+- `main` and `develop` protected. No force pushes, no direct commits. All changes through PRs with passing CI.

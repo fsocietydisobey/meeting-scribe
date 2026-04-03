@@ -1,0 +1,19 @@
+---
+description: Dependency evaluation, version pinning, and audit policy
+alwaysApply: true
+---
+
+# Dependency Policy
+
+## Adding
+- Check stdlib/existing deps first. Evaluate: maintenance, downloads, license, size, transitives.
+- Prefer small focused packages. Justify in PR description.
+
+## Pinning
+- Exact versions in production (no ^/~). Commit lockfiles (`uv.lock`, `package-lock.json`).
+
+## Auditing
+- `npm audit` / `pip audit` in CI. High/critical vulns block merges. Monthly update reviews.
+
+## Banned
+- No deps for stdlib functionality. No deps with unpatched CVEs. No deps unmaintained 2+ years.

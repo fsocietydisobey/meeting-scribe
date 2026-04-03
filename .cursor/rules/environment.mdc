@@ -1,0 +1,19 @@
+---
+description: Environment variables, config loading, and deployment environments
+alwaysApply: true
+---
+
+# Environment & Configuration
+
+## Environment variables
+- All config from env vars in production. `.env` for local dev (gitignored). `.env.example` committed with placeholders and comments.
+
+## Config loading
+- Single config module (`src/chimera_sdk/config/`). Pydantic `BaseSettings` for validation.
+- Fail fast on missing required vars. Never scatter `os.getenv()` — all access through config module.
+
+## Environments
+- `development` — local, debug logging, relaxed limits.
+- `staging` — mirrors production, synthetic data, full observability.
+- `production` — strict validation, secret manager, no debug logging.
+- Set via `CHIMERA_ENV` variable.

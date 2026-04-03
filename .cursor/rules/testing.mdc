@@ -1,0 +1,26 @@
+---
+description: Testing standards, coverage requirements, and test organization
+alwaysApply: true
+---
+
+# Testing Standards
+
+## Coverage
+- Minimum 80% line coverage. Critical paths (event pipeline, hypervisor, auth): 95%+.
+- CI blocks PRs that drop below threshold.
+
+## Organization
+- Mirror source structure: `src/foo/bar.ts` → `tests/foo/bar.test.ts`
+- Group by behavior, not method. Descriptive names: `"flushes buffer immediately on navigation event"`.
+
+## Test types
+- **Unit** — isolated, mock externals. **Integration** — real/containerized deps. **E2E** — Playwright (frontend), httpx (backend).
+- New features require unit tests. Integration tests when crossing module boundaries.
+
+## Quality
+- Deterministic. No flaky tests. Fake timers for timing deps.
+- No inter-test state deps. Each test owns its fixtures.
+- Test edge cases and error paths. Use factories for test data.
+
+## Before merging
+- All tests pass. No skipped tests without linked issue. New code has tests, no exceptions.

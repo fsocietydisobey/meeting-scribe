@@ -1,0 +1,28 @@
+---
+description: Security standards for secrets, auth, input validation, and data privacy
+alwaysApply: true
+---
+
+# Security
+
+## Secrets
+- No secrets in code. All from env vars or secret manager.
+- `.env` gitignored. `.env.example` committed with placeholders.
+- API keys prefixed: `pk_` (public/frontend), `sk_` (secret/backend).
+
+## Input validation
+- Validate at boundaries: route handlers, WebSocket handlers, SDK init.
+- Pydantic models for all incoming backend data. No raw dict access.
+- Sanitize user strings before DOM rendering (prevent XSS). Reject payloads > 1MB.
+
+## Auth
+- Every request needs a valid API key. No anonymous access.
+- `pk_`: read-only, rate-limited, frontend-safe. `sk_`: full access, server-side only.
+- Validate keys via middleware. Cache lookups (5 min TTL). Scope all queries to authenticated `app_id`.
+
+## Dependencies
+- `npm audit` / `pip audit` in CI. Block high/critical vulns. Pin versions. Review before adding.
+
+## Data privacy
+- No PII at INFO+. Session data scoped per-user per-app. Row-level security in PostgreSQL.
+- SDK never captures: keystroke content, passwords, screen recordings, clipboard, off-page browser content.

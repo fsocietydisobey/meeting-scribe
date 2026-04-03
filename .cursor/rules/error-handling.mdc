@@ -1,0 +1,25 @@
+---
+description: Error handling patterns for frontend and backend
+alwaysApply: true
+---
+
+# Error Handling
+
+## Backend (Python)
+- Consistent error envelope: `{ "error": { "code": "...", "message": "...", "details": {} } }`
+- Typed exception classes mapping to HTTP status codes. Never raise raw `Exception`.
+- Catch at the boundary (route handler). Let exceptions propagate naturally.
+- Log errors with context (request ID, tenant ID) at ERROR. Stack traces at DEBUG.
+- Never expose internals in API responses.
+
+## Frontend (TypeScript)
+- React Error Boundaries for rendering errors. Never crash the host app.
+- All async ops must have error handling. No unhandled rejections.
+- Network errors: retry with exponential backoff (max 3). Degrade gracefully on failure.
+- SDK must be invisible when it fails. No error modals, no console spam.
+- Validate all data from backend before rendering.
+
+## Both
+- Never swallow errors silently — log or re-throw.
+- Error messages must be actionable: what went wrong AND what to do.
+- Use error codes for programmatic handling.

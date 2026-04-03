@@ -1,0 +1,23 @@
+---
+description: Project overview for the Chimera Guidance SDK
+alwaysApply: true
+---
+
+# Project: Chimera SDK
+
+AI-powered user guidance platform. Drop-in SDK that observes web app user behavior, detects stuck/confused states, and delivers contextual help — or stays silent when users are in flow.
+
+## Packages
+- `@chimera/sdk` (npm) — JS/TS frontend: event collection, widget, spatial overlay
+- `chimera-sdk` (PyPI) — Python backend: flow registration, rules, analytics API
+
+## Commands
+- `uv run python main.py` — run backend
+- `uv install <package>` — add Python dependency
+- `black <file>` — format Python (always run after changes)
+
+## Parent project
+Inherits patterns from CHIMERA (`/home/_3ntropy/dev/chimera`). See `docs/daemon-project-handoff.md`.
+
+## Build order
+1. JS event collector → 2. Backend event pipeline → 3. Rules classifier → 4. Hypervisor → 5. Widget → 6. Spatial overlay → 7. Memory → 8. Dashboard → 9. Multi-tenant → 10. NPM + PyPI

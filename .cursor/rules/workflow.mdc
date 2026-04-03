@@ -1,0 +1,18 @@
+---
+description: Rule sync policy, formatting, documentation standards
+alwaysApply: true
+---
+
+# Workflow Rules
+
+## Rule sync policy
+CLAUDE.md, `.claude/rules/`, and `.cursor/rules/` must stay in sync. When you add, change, or remove a rule in one, apply the same change to the others in the same operation. If they diverge, that's a bug — fix immediately.
+
+## Code formatting
+Always run `black` after modifying a Python file. Never commit unformatted Python code.
+
+## Package management
+Use `uv install <package>` to install dependencies.
+
+## Documentation
+Always use mermaid diagrams for flows, architecture, state transitions, and relationships. Prefer a diagram over a wall of text.

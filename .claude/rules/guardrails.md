@@ -1,0 +1,14 @@
+# Guardrails
+
+## Things to avoid
+- Never use sync I/O in async code paths.
+- Never commit `.env`, `*.db`, or files with API keys.
+- Never render hints after the user has left the page — verify context first.
+- Never use LLM calls where the rules engine suffices.
+- Check existing deps before adding new ones.
+
+## Latency targets
+- Prefetched/cached: < 5ms
+- Rules engine: < 50ms
+- Haiku fallback: < 300ms (cache after)
+- Spatial/vision: < 1s (explicit user action)

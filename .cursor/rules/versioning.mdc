@@ -1,0 +1,17 @@
+---
+description: Semver strategy, version sync, changelog, and release process
+alwaysApply: true
+---
+
+# Versioning & Releases
+
+## Semver
+- Both packages follow strict semver. MAJOR (breaking), MINOR (features), PATCH (fixes).
+- NPM and PyPI share the same version number.
+
+## Changelog
+- `CHANGELOG.md` at root. Every version: date, version, grouped changes (Added/Changed/Fixed/Removed).
+- Generated from conventional commits.
+
+## Releases
+- Git tags (`v1.0.0`) trigger CI publish. Never publish from local. Test artifact before announcing.
