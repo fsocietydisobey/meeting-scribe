@@ -1,20 +1,16 @@
 """Summarization node — generates a concise meeting summary."""
 
-from meeting_scribe.log import get_logger
-from meeting_scribe.nodes import get_client
+from meeting_scribe.nodes import get_client, get_model
 from meeting_scribe.state import MeetingState
-
-log = get_logger("summarize")
 
 
 async def summarize(state: MeetingState) -> dict:
     """Summarize the meeting transcript using Gemini."""
     transcript = state["transcript"]
-    log.info("Summarizing transcript (%d chars)", len(transcript))
 
     client = get_client()
     response = await client.aio.models.generate_content(
-        model="gemini-2.5-flash",
+        model=get_model(),
         contents=[
             {
                 "parts": [
@@ -35,6 +31,4 @@ async def summarize(state: MeetingState) -> dict:
         ],
     )
 
-    log.info("Summary generated (%d chars)", len(response.text))
-    log.debug("Summary:\n%s", response.text)
     return {"summary": response.text}

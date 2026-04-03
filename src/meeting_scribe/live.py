@@ -20,11 +20,12 @@ import soundfile as sf
 from google import genai
 from google.genai import types
 
+import logging
+
 from meeting_scribe.config import Config
-from meeting_scribe.log import get_logger
 from meeting_scribe.recorder import _get_default_monitor, _get_default_source, _get_device_index
 
-log = get_logger("live")
+log = logging.getLogger("meeting_scribe.live")
 
 SAMPLE_RATE = 16_000  # Gemini Live API requires 16kHz input
 CHUNK_SECONDS = 1.0   # Send audio every 1s

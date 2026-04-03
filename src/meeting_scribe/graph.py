@@ -1,11 +1,11 @@
-"""LangGraph pipeline: transcribe → summarize → extract."""
+"""LangGraph pipeline: transcribe → (summarize + extract + emotions) in parallel."""
 
 import asyncio
 from pathlib import Path
 
 from langgraph.graph import StateGraph
 
-from meeting_scribe.log import get_logger
+from meeting_scribe.log import get_tracer
 
 from meeting_scribe.nodes.emotion import detect_emotions
 from meeting_scribe.nodes.extract import extract_actions
@@ -41,15 +41,10 @@ def compile_graph():
     return build_graph().compile()
 
 
-log = get_logger("graph")
-
-
 async def process_meeting(audio_path: str | Path) -> MeetingState:
     """Run the full pipeline on an audio file. Returns final state."""
-    log.info("Starting pipeline: %s", audio_path)
     app = compile_graph()
-    result = await app.ainvoke({"audio_path": str(audio_path)})
-    log.info("Pipeline complete")
+    result = await app.ainvoke({"audio_path": str(audio_path)}, config={"callbacks": [get_tracer()]})
     return result
 
 

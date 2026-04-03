@@ -15,7 +15,7 @@ class Config:
     """Runtime configuration."""
 
     gemini_api_key: str = field(default_factory=lambda: os.environ.get("GOOGLE_AI_API_KEY", ""))
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-2.0-flash"
     output_dir: Path = DEFAULT_OUTPUT_DIR
     sample_rate: int = DEFAULT_SAMPLE_RATE
     channels: int = DEFAULT_CHANNELS
@@ -30,6 +30,6 @@ def load_config() -> Config:
     """Load config from environment variables."""
     return Config(
         gemini_api_key=os.environ.get("GOOGLE_AI_API_KEY", ""),
-        gemini_model=os.environ.get("GEMINI_MODEL", "gemini-2.5-flash"),
+        gemini_model=os.environ.get("GEMINI_MODEL", "gemini-2.0-flash"),
         output_dir=Path(os.environ.get("SCRIBE_OUTPUT_DIR", DEFAULT_OUTPUT_DIR)),
     )

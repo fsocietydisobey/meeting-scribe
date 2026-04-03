@@ -2,21 +2,17 @@
 
 import json
 
-from meeting_scribe.log import get_logger
-from meeting_scribe.nodes import get_client
+from meeting_scribe.nodes import get_client, get_model
 from meeting_scribe.state import MeetingState
-
-log = get_logger("extract")
 
 
 async def extract_actions(state: MeetingState) -> dict:
     """Extract action items, decisions, and participants from the transcript."""
     transcript = state["transcript"]
-    log.info("Extracting action items, decisions, participants")
 
     client = get_client()
     response = await client.aio.models.generate_content(
-        model="gemini-2.5-flash",
+        model=get_model(),
         contents=[
             {
                 "parts": [
@@ -46,16 +42,11 @@ async def extract_actions(state: MeetingState) -> dict:
 
     try:
         text = response.text.strip()
-        # Strip markdown code fences if present
         if text.startswith("```"):
             text = text.split("\n", 1)[1]
             text = text.rsplit("```", 1)[0]
         data = json.loads(text)
-        log.info("Extracted %d action items, %d decisions, %d participants",
-                 len(data.get("action_items", [])), len(data.get("decisions", [])),
-                 len(data.get("participants", [])))
     except (json.JSONDecodeError, IndexError):
-        log.warning("Failed to parse Gemini response as JSON, returning empty results")
         data = {
             "action_items": [],
             "decisions": [],

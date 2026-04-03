@@ -62,7 +62,7 @@ uv sync
 export GOOGLE_AI_API_KEY="your-api-key-here"
 
 # Optional
-export GEMINI_MODEL="gemini-2.5-flash"                       # Model for batch processing
+export GEMINI_MODEL="gemini-2.0-flash"                       # Model for batch processing
 export SCRIBE_OUTPUT_DIR="~/.local/share/meeting-scribe"     # Where recordings are saved
 
 # LangSmith tracing (optional — traces LangGraph pipeline)
@@ -244,7 +244,7 @@ src/meeting_scribe/
   graph.py            # LangGraph pipeline with parallel nodes
   state.py            # Pipeline state (TypedDict)
   config.py           # Config + environment variables
-  log.py              # Structured logging to stderr
+  log.py              # Pipeline tracer (local LangSmith alternative)
   nodes/
     __init__.py       # Shared Gemini client (reads GOOGLE_AI_API_KEY)
     transcribe.py     # Gemini audio → transcript (batch)
@@ -252,6 +252,75 @@ src/meeting_scribe/
     extract.py        # Transcript → action items, decisions, participants
     emotion.py        # Audio + transcript → speaker emotions, meeting mood
 ```
+
+## Debugging & Tracing
+
+Meeting Scribe includes a built-in pipeline tracer that prints node execution, tool calls, LLM activity, retries, and errors directly to your terminal — no external dashboard required.
+
+### Local tracing (terminal)
+
+```bash
+# INFO — node names, timing, input/output keys, parallel detection
+uv run meeting-scribe record -p
+
+# DEBUG — adds input/output values, LLM model info, tool args, final state
+LOG_LEVEL=DEBUG uv run meeting-scribe record -p
+```
+
+**INFO output:**
+```
+┌ LangGraph  input: audio_path
+│
+│  ├── transcribe  ← audio_path
+│  │   2.1s  → transcript
+│
+│  ├── summarize  ← audio_path, transcript
+│  ├── extract_actions  (parallel)  ← audio_path, transcript
+│  ├── detect_emotions  (parallel)  ← audio_path, transcript
+│  │   0.7s  → action_items, decisions, participants
+│  │   0.8s  → summary
+│  │   1.2s  → speaker_emotions, meeting_mood
+│
+└ Done  3.3s
+```
+
+**DEBUG output** adds `in.*` and `out.*` values under each node, plus the full final state.
+
+### What gets traced
+
+| Event | Symbol | What you see |
+|---|---|---|
+| Node start | `├──` | Name, `(parallel)` tag, input keys |
+| Node end | timing | Elapsed (green < 2s, yellow < 10s, red > 10s), output keys |
+| Tool call | `⚡` | Tool name, args (DEBUG), result |
+| LLM call | `🔮` | Model name, token count, response preview |
+| Retry | `↻` | Attempt number, error reason |
+| Error | `✗` | Node name, exception type, message |
+
+### LangSmith (cloud dashboard)
+
+For the full visual trace experience, set these env vars and LangGraph traces automatically:
+
+```bash
+export LANGSMITH_TRACING=true
+export LANGSMITH_ENDPOINT=https://api.smith.langchain.com
+export LANGSMITH_API_KEY="your-langsmith-key"
+export LANGSMITH_PROJECT="meeting-scribe"
+```
+
+Both local and LangSmith tracing can run simultaneously.
+
+### Reusing the tracer in other LangGraph projects
+
+The tracer is a single file (`log.py`) with no project-specific dependencies. Copy it into any LangGraph project and wire it in:
+
+```python
+from your_project.log import get_tracer
+
+result = await app.ainvoke(inputs, config={"callbacks": [get_tracer()]})
+```
+
+Zero code changes needed in your nodes — the callback handles everything.
 
 ## Extending the pipeline
 
