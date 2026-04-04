@@ -2,6 +2,7 @@
 
 import asyncio
 from pathlib import Path
+from typing import cast
 
 from langgraph.graph import StateGraph
 
@@ -44,8 +45,10 @@ def compile_graph():
 async def process_meeting(audio_path: str | Path) -> MeetingState:
     """Run the full pipeline on an audio file. Returns final state."""
     app = compile_graph()
-    result = await app.ainvoke({"audio_path": str(audio_path)}, config={"callbacks": [get_tracer()]})
-    return result
+    result = await app.ainvoke(
+        {"audio_path": str(audio_path)}, config={"callbacks": [get_tracer()]}
+    )
+    return cast(MeetingState, result)
 
 
 def process_meeting_sync(audio_path: str | Path) -> MeetingState:

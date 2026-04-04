@@ -23,12 +23,16 @@ from google.genai import types
 import logging
 
 from meeting_scribe.config import Config
-from meeting_scribe.recorder import _get_default_monitor, _get_default_source, _get_device_index
+from meeting_scribe.recorder import (
+    _get_default_monitor,
+    _get_default_source,
+    _get_device_index,
+)
 
 log = logging.getLogger("meeting_scribe.live")
 
 SAMPLE_RATE = 16_000  # Gemini Live API requires 16kHz input
-CHUNK_SECONDS = 1.0   # Send audio every 1s
+CHUNK_SECONDS = 1.0  # Send audio every 1s
 LIVE_MODEL = "gemini-3.1-flash-live-preview"
 
 
@@ -67,7 +71,9 @@ async def live_transcribe(config: Config) -> dict:
 
     chunk_samples = int(SAMPLE_RATE * CHUNK_SECONDS)
 
-    def _audio_callback(indata: np.ndarray, frames: int, time_info: object, status: object) -> None:
+    def _audio_callback(
+        indata: np.ndarray, frames: int, time_info: object, status: object
+    ) -> None:
         """Sounddevice callback — converts float32 to PCM16 little-endian."""
         if status:
             log.warning("Audio status: %s", status)
@@ -88,7 +94,7 @@ async def live_transcribe(config: Config) -> dict:
     client = genai.Client(api_key=config.gemini_api_key)
 
     live_config = types.LiveConnectConfig(
-        response_modalities=["AUDIO"],
+        response_modalities=[types.Modality.AUDIO],
         input_audio_transcription=types.AudioTranscriptionConfig(),
         output_audio_transcription=types.AudioTranscriptionConfig(),
         system_instruction=(

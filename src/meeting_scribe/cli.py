@@ -5,14 +5,16 @@ import asyncio
 import json
 import sys
 from pathlib import Path
+from typing import cast
 
 from meeting_scribe.config import load_config
 from meeting_scribe.graph import process_meeting
 from meeting_scribe.live import live_transcribe
 from meeting_scribe.recorder import record_meeting
+from meeting_scribe.state import MeetingState
 
 
-def _print_results(result: dict) -> None:
+def _print_results(result: MeetingState) -> None:
     """Pretty-print pipeline results to stdout."""
     print("\n" + "=" * 60)
     print("MEETING SCRIBE — Results")
@@ -101,7 +103,7 @@ def cmd_live(args: argparse.Namespace) -> None:
         full_result["transcript"] = result["transcript"]
         _print_results(full_result)
     else:
-        _print_results(result)
+        _print_results(cast(MeetingState, result))
 
 
 def cmd_list(_args: argparse.Namespace) -> None:
@@ -132,7 +134,8 @@ def main() -> None:
     # record
     rec_parser = subparsers.add_parser("record", help="Record a meeting")
     rec_parser.add_argument(
-        "--process", "-p",
+        "--process",
+        "-p",
         action="store_true",
         help="Process the recording immediately after stopping",
     )
@@ -144,9 +147,12 @@ def main() -> None:
     proc_parser.set_defaults(func=cmd_process)
 
     # live
-    live_parser = subparsers.add_parser("live", help="Live transcription with real-time streaming")
+    live_parser = subparsers.add_parser(
+        "live", help="Live transcription with real-time streaming"
+    )
     live_parser.add_argument(
-        "--summarize", "-s",
+        "--summarize",
+        "-s",
         action="store_true",
         help="Run summary + extraction after stopping",
     )

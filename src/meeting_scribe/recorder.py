@@ -26,7 +26,9 @@ def _get_default_monitor() -> str | None:
     try:
         result = subprocess.run(
             ["pactl", "get-default-sink"],
-            capture_output=True, text=True, check=True,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         default_sink = result.stdout.strip()
         return f"{default_sink}.monitor"
@@ -39,7 +41,9 @@ def _get_default_source() -> str | None:
     try:
         result = subprocess.run(
             ["pactl", "get-default-source"],
-            capture_output=True, text=True, check=True,
+            capture_output=True,
+            text=True,
+            check=True,
         )
         return result.stdout.strip()
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -186,6 +190,8 @@ def record_meeting(config: Config) -> Path:
     elif monitor_audio is not None:
         audio = monitor_audio
     else:
+        # mic_audio is guaranteed non-None here (we exit above if both are None)
+        assert mic_audio is not None
         audio = mic_audio
 
     sf.write(str(output_path), audio, config.sample_rate)

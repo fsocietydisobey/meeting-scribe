@@ -4,7 +4,6 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
-
 DEFAULT_OUTPUT_DIR = Path.home() / ".local" / "share" / "meeting-scribe"
 DEFAULT_SAMPLE_RATE = 16_000
 DEFAULT_CHANNELS = 1
@@ -14,7 +13,9 @@ DEFAULT_CHANNELS = 1
 class Config:
     """Runtime configuration."""
 
-    gemini_api_key: str = field(default_factory=lambda: os.environ.get("GOOGLE_AI_API_KEY", ""))
+    gemini_api_key: str = field(
+        default_factory=lambda: os.environ.get("GOOGLE_AI_API_KEY", "")
+    )
     gemini_model: str = "gemini-2.0-flash"
     output_dir: Path = DEFAULT_OUTPUT_DIR
     sample_rate: int = DEFAULT_SAMPLE_RATE

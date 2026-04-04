@@ -35,7 +35,15 @@ logging.basicConfig(
     force=True,
 )
 
-for _name in ("httpx", "httpcore", "urllib3", "google.auth", "websockets", "langsmith.client", "asyncio"):
+for _name in (
+    "httpx",
+    "httpcore",
+    "urllib3",
+    "google.auth",
+    "websockets",
+    "langsmith.client",
+    "asyncio",
+):
     logging.getLogger(_name).setLevel(logging.WARNING)
 
 # ---------------------------------------------------------------------------
@@ -80,6 +88,7 @@ def _kv_lines(data: dict, prefix: str) -> list[str]:
 # ---------------------------------------------------------------------------
 # Tracer
 # ---------------------------------------------------------------------------
+
 
 class PipelineTracer(AsyncCallbackHandler):
     """Full-featured pipeline tracer that prints to stderr.
@@ -152,7 +161,9 @@ class PipelineTracer(AsyncCallbackHandler):
         if self._parent is None:
             self._parent = rid
             input_keys = ", ".join(inputs.keys()) if isinstance(inputs, dict) else "?"
-            self._out(f"\n{_BOLD}{_CYAN}┌ {name}{_RESET}  {_DIM}input: {input_keys}{_RESET}")
+            self._out(
+                f"\n{_BOLD}{_CYAN}┌ {name}{_RESET}  {_DIM}input: {input_keys}{_RESET}"
+            )
             self._out(_PIPE)
             if IS_DEBUG and isinstance(inputs, dict):
                 for line in _kv_lines(inputs, f"{_PIPE}  {_DIM}"):
@@ -162,10 +173,14 @@ class PipelineTracer(AsyncCallbackHandler):
 
         # Node
         self._active_parallel.add(rid)
-        parallel_tag = f"  {_DIM}(parallel){_RESET}" if len(self._active_parallel) > 1 else ""
+        parallel_tag = (
+            f"  {_DIM}(parallel){_RESET}" if len(self._active_parallel) > 1 else ""
+        )
         input_keys = ", ".join(inputs.keys()) if isinstance(inputs, dict) else "?"
 
-        self._out(f"{_PIPE}  {_BOLD}├── {name}{_RESET}{parallel_tag}  {_DIM}← {input_keys}{_RESET}")
+        self._out(
+            f"{_PIPE}  {_BOLD}├── {name}{_RESET}{parallel_tag}  {_DIM}← {input_keys}{_RESET}"
+        )
 
         if IS_DEBUG and isinstance(inputs, dict):
             for line in _kv_lines(inputs, f"{_PIPE}  {_GREY}│{_RESET}   {_DIM}in."):
@@ -195,7 +210,9 @@ class PipelineTracer(AsyncCallbackHandler):
 
         # Node done
         output_keys = ", ".join(outputs.keys()) if isinstance(outputs, dict) else "?"
-        self._out(f"{_PIPE}  {_GREY}│{_RESET}   {tc}{elapsed:.1f}s{_RESET}  {_DIM}→ {output_keys}{_RESET}")
+        self._out(
+            f"{_PIPE}  {_GREY}│{_RESET}   {tc}{elapsed:.1f}s{_RESET}  {_DIM}→ {output_keys}{_RESET}"
+        )
 
         if IS_DEBUG and isinstance(outputs, dict):
             for line in _kv_lines(outputs, f"{_PIPE}  {_GREY}│{_RESET}   {_DIM}out."):
@@ -203,12 +220,18 @@ class PipelineTracer(AsyncCallbackHandler):
 
         self._out(_PIPE)
 
-    async def on_chain_error(self, error: BaseException, *, run_id: Any, **kwargs: Any) -> None:
+    async def on_chain_error(
+        self, error: BaseException, *, run_id: Any, **kwargs: Any
+    ) -> None:
         rid, name, kind, elapsed = self._resolve(run_id, **kwargs)
         self._active_parallel.discard(rid)
 
-        self._out(f"{_PIPE}  {_RED}{_BOLD}✗ {name}{_RESET}  {_RED}({elapsed:.1f}s){_RESET}")
-        self._out(f"{_PIPE}    {_RED}{type(error).__name__}: {_truncate(error, 200)}{_RESET}")
+        self._out(
+            f"{_PIPE}  {_RED}{_BOLD}✗ {name}{_RESET}  {_RED}({elapsed:.1f}s){_RESET}"
+        )
+        self._out(
+            f"{_PIPE}    {_RED}{type(error).__name__}: {_truncate(error, 200)}{_RESET}"
+        )
         self._out(_PIPE)
 
     # -------------------------------------------------------------------
@@ -221,11 +244,15 @@ class PipelineTracer(AsyncCallbackHandler):
         name = kwargs.get("name") or (serialized or {}).get("name", "tool")
         self._register(run_id, name, "tool")
 
-        self._out(f"{_PIPE}  {_GREY}│{_RESET}   {_BLUE}⚡ {name}{_RESET}  {_DIM}called{_RESET}")
+        self._out(
+            f"{_PIPE}  {_GREY}│{_RESET}   {_BLUE}⚡ {name}{_RESET}  {_DIM}called{_RESET}"
+        )
 
         if IS_DEBUG:
             inputs = kwargs.get("inputs", input_str)
-            self._out(f"{_PIPE}  {_GREY}│{_RESET}     {_DIM}args: {_truncate(inputs)}{_RESET}")
+            self._out(
+                f"{_PIPE}  {_GREY}│{_RESET}     {_DIM}args: {_truncate(inputs)}{_RESET}"
+            )
 
     async def on_tool_end(self, output: Any, *, run_id: Any, **kwargs: Any) -> None:
         rid, name, kind, elapsed = self._resolve(run_id, **kwargs)
@@ -236,7 +263,9 @@ class PipelineTracer(AsyncCallbackHandler):
             f"{_BLUE}↳{_RESET} {tc}{elapsed:.1f}s{_RESET}  {_DIM}{_truncate(output, 100)}{_RESET}"
         )
 
-    async def on_tool_error(self, error: BaseException, *, run_id: Any, **kwargs: Any) -> None:
+    async def on_tool_error(
+        self, error: BaseException, *, run_id: Any, **kwargs: Any
+    ) -> None:
         rid, name, kind, elapsed = self._resolve(run_id, **kwargs)
 
         self._out(
@@ -300,11 +329,19 @@ class PipelineTracer(AsyncCallbackHandler):
             if not text and hasattr(response, "generations"):
                 gens = response.generations
                 if gens and gens[0]:
-                    text = str(gens[0][0].text) if hasattr(gens[0][0], "text") else str(gens[0][0])
+                    text = (
+                        str(gens[0][0].text)
+                        if hasattr(gens[0][0], "text")
+                        else str(gens[0][0])
+                    )
             if text:
-                self._out(f"{_PIPE}  {_GREY}│{_RESET}     {_DIM}response: {_truncate(text, 200)}{_RESET}")
+                self._out(
+                    f"{_PIPE}  {_GREY}│{_RESET}     {_DIM}response: {_truncate(text, 200)}{_RESET}"
+                )
 
-    async def on_llm_error(self, error: BaseException, *, run_id: Any, **kwargs: Any) -> None:
+    async def on_llm_error(
+        self, error: BaseException, *, run_id: Any, **kwargs: Any
+    ) -> None:
         rid, name, kind, elapsed = self._resolve(run_id, **kwargs)
 
         self._out(
@@ -320,7 +357,11 @@ class PipelineTracer(AsyncCallbackHandler):
         attempt = getattr(retry_state, "attempt_number", "?")
         outcome = getattr(retry_state, "outcome", None)
         exc = outcome.exception() if outcome and outcome.failed else None
-        reason = f"  {_DIM}{type(exc).__name__}: {_truncate(exc, 100)}{_RESET}" if exc else ""
+        reason = (
+            f"  {_DIM}{type(exc).__name__}: {_truncate(exc, 100)}{_RESET}"
+            if exc
+            else ""
+        )
 
         self._out(
             f"{_PIPE}  {_GREY}│{_RESET}   {_YELLOW}↻ Retry{_RESET}  "
@@ -331,7 +372,7 @@ class PipelineTracer(AsyncCallbackHandler):
 def get_tracer() -> PipelineTracer:
     """Get a fresh pipeline tracer. Wire into any LangGraph app:
 
-        from your_project.log import get_tracer
-        result = await app.ainvoke(inputs, config={"callbacks": [get_tracer()]})
+    from your_project.log import get_tracer
+    result = await app.ainvoke(inputs, config={"callbacks": [get_tracer()]})
     """
     return PipelineTracer()

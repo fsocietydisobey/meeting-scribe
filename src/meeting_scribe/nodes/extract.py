@@ -41,7 +41,8 @@ async def extract_actions(state: MeetingState) -> dict:
     )
 
     try:
-        text = response.text.strip()
+        raw = response.text or ""
+        text = raw.strip()
         if text.startswith("```"):
             text = text.split("\n", 1)[1]
             text = text.rsplit("```", 1)[0]
